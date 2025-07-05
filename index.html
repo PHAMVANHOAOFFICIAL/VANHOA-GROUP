@@ -153,7 +153,7 @@
       <input type="text" id="soDT" placeholder="Số điện thoại" oninput="autoFormatPhone(this)">
       <input type="text" id="soCCCD" placeholder="Số CCCD">
       <button onclick="submitForm()">Gửi thông tin</button>
-      <div class="thankyou" id="thankyouMsg">
+      <div class="thankyou" id="thankyouMessage">
         CẢM ƠN BẠN ĐÃ GỬI THÔNG TIN CHO CHÚNG TÔI! CHÚNG TÔI SẼ SỚM LIÊN HỆ LẠI CHO BẠN TRONG THỜI GIAN SỚM NHẤT!
       </div>
     </div>
@@ -162,7 +162,7 @@
   <script>
     function openForm(khu) {
       document.getElementById('formOverlay').style.display = 'flex';
-      document.getElementById('thankyouMsg').style.display = 'none';
+      document.getElementById('thankyouMessage').style.display = 'none';
     }
     function closeForm() {
       document.getElementById('formOverlay').style.display = 'none';
@@ -173,37 +173,51 @@
       else input.value = raw;
     }
     function submitForm() {
-      const hoTen = document.getElementById('hoTen').value.trim();
-      const gioiTinh = document.getElementById('gioiTinh').value;
-      const namSinh = document.getElementById('namSinh').value;
-      const queQuan = document.getElementById('queQuan').value;
-      const danToc = document.getElementById('danToc').value.trim();
-      const soDT = document.getElementById('soDT').value.trim();
-      const soCCCD = document.getElementById('soCCCD').value.trim();
+      const data = {
+        hoTen: document.getElementById('hoTen').value.trim(),
+        gioiTinh: document.getElementById('gioiTinh').value,
+        namSinh: document.getElementById('namSinh').value,
+        queQuan: document.getElementById('queQuan').value,
+        danToc: document.getElementById('danToc').value.trim(),
+        soDT: document.getElementById('soDT').value.trim(),
+        soCCCD: document.getElementById('soCCCD').value.trim()
+      };
 
-      if (!hoTen || !gioiTinh || !namSinh || !queQuan || !danToc || !soDT || !soCCCD) {
+      if (Object.values(data).some(v => !v)) {
         alert("Vui lòng điền đầy đủ thông tin!");
         return;
       }
-      if (!/^\d{4} \d{3} \d{3}$/.test(soDT)) {
+      if (!/^\d{4} \d{3} \d{3}$/.test(data.soDT)) {
         alert("Số điện thoại không đúng định dạng!");
         return;
       }
-      if (!/^\d{12}$/.test(soCCCD)) {
+      if (!/^\d{12}$/.test(data.soCCCD)) {
         alert("CCCD phải đúng 12 số!");
         return;
       }
-      document.getElementById('thankyouMsg').style.display = 'block';
+
+      fetch("https://script.google.com/macros/s/AKfycbzYzQUIgW_kk6wfmAMP_cfRmjzpb0lZtSdAgtenegc/dev", {
+        method: "POST",
+        body: JSON.stringify(data),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }).then(res => {
+        if (res.ok) {
+          document.getElementById("thankyouMessage").style.display = "block";
+          document.getElementById("formOverlay").style.display = "none";
+        } else {
+          alert("Gửi không thành công!");
+        }
+      }).catch(err => alert("Lỗi gửi dữ liệu: " + err));
     }
 
-    // Sinh năm
     for (let y = 1900; y <= 2099; y++) {
       const opt = document.createElement('option');
       opt.text = opt.value = y;
       document.getElementById('namSinh').appendChild(opt);
     }
 
-    // Danh sách tỉnh
     const tinh = ["An Giang","Bà Rịa - Vũng Tàu","Bắc Giang","Bắc Kạn","Bạc Liêu","Bắc Ninh","Bến Tre","Bình Định","Bình Dương","Bình Phước","Bình Thuận","Cà Mau","Cần Thơ","Cao Bằng","Đà Nẵng","Đắk Lắk","Đắk Nông","Điện Biên","Đồng Nai","Đồng Tháp","Gia Lai","Hà Giang","Hà Nam","Hà Nội","Hà Tĩnh","Hải Dương","Hải Phòng","Hậu Giang","Hòa Bình","Hưng Yên","Khánh Hòa","Kiên Giang","Kon Tum","Lai Châu","Lâm Đồng","Lạng Sơn","Lào Cai","Long An","Nam Định","Nghệ An","Ninh Bình","Ninh Thuận","Phú Thọ","Phú Yên","Quảng Bình","Quảng Nam","Quảng Ngãi","Quảng Ninh","Quảng Trị","Sóc Trăng","Sơn La","Tây Ninh","Thái Bình","Thái Nguyên","Thanh Hóa","Thừa Thiên Huế","Tiền Giang","TP Hồ Chí Minh","Trà Vinh","Tuyên Quang","Vĩnh Long","Vĩnh Phúc","Yên Bái"];
     const q = document.getElementById('queQuan');
     tinh.forEach(t => {
