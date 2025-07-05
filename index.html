@@ -160,41 +160,34 @@
   </div>
 
   <script>
-    function openForm(khu) {
-      document.getElementById('formOverlay').style.display = 'flex';
-      document.getElementById('thankyouMessage').style.display = 'none';
-    }
-    function closeForm() {
-      document.getElementById('formOverlay').style.display = 'none';
-    }
-    function autoFormatPhone(input) {
-      let raw = input.value.replace(/\D/g, '').substring(0,10);
-      if (raw.length >= 10) input.value = raw.replace(/(\d{4})(\d{3})(\d{3})/, "$1 $2 $3");
-      else input.value = raw;
-    }
-    function submitForm() {
-      const data = {
-        hoTen: document.getElementById('hoTen').value.trim(),
-        gioiTinh: document.getElementById('gioiTinh').value,
-        namSinh: document.getElementById('namSinh').value,
-        queQuan: document.getElementById('queQuan').value,
-        danToc: document.getElementById('danToc').value.trim(),
-        soDT: document.getElementById('soDT').value.trim(),
-        soCCCD: document.getElementById('soCCCD').value.trim()
-      };
+function submitForm() {
+  fetch("https://script.google.com/macros/s/AKfycbzAnY7M3lp6Lz6Fz2cSRA1zpSU5iPjJYBHw8BwTsy0FODXhbC-iDf7rC10InAru35gD/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      hoTen: document.getElementById("hoTen").value,
+      gioiTinh: document.getElementById("gioiTinh").value,
+      namSinh: document.getElementById("namSinh").value,
+      queQuan: document.getElementById("queQuan").value,
+      danToc: document.getElementById("danToc").value,
+      soDT: document.getElementById("soDT").value,
+      soCCCD: document.getElementById("soCCCD").value
+    })
+  })
+  .then(res => res.text())
+  .then(data => {
+    alert("✅ Gửi thành công!");
+    console.log(data);
+  })
+  .catch(err => {
+    alert("❌ Lỗi gửi dữ liệu");
+    console.error("Lỗi:", err);
+  });
+}
+</script>
 
-      if (Object.values(data).some(v => !v)) {
-        alert("Vui lòng điền đầy đủ thông tin!");
-        return;
-      }
-      if (!/^\d{4} \d{3} \d{3}$/.test(data.soDT)) {
-        alert("Số điện thoại không đúng định dạng!");
-        return;
-      }
-      if (!/^\d{12}$/.test(data.soCCCD)) {
-        alert("CCCD phải đúng 12 số!");
-        return;
-      }
 
       fetch("https://script.google.com/macros/s/AKfycbzAnY7M3lp6Lz6Fz2cSRA1zpSU5iPjJYBHw8BwTsy0FODXhbC-iDf7rC10InAru35gD/exec", {
         method: "POST",
